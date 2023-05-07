@@ -1,45 +1,38 @@
-// Import required modules
 const express = require("express");
 const bodyParser = require("body-parser");
 const twilio = require("twilio");
 
-// Set up Twilio account information (replace with your own)
-const accountSid = "AC658864b79181cc8dad0a43950e9f23a2";
-const authToken = "SK8ba7cd93cea0d6da2f617ab4130b2994";
-const client = new twilio(accountSid, authToken);
-
-// Initialize the Express app
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Create the webhook endpoint for the Twilio Pre-Event URL
-app.post("/twilio_pre_event", (req, res) => {
-    console.log("aaaa");
-    // Extract required data from the request body
-    const fromPhoneNumber = req.body.From;
-    const toPhoneNumber = req.body.To;
+// Replace these with your Twilio Account SID and Auth Token
+const TWILIO_ACCOUNT_SID = "AC658864b79181cc8dad0a43950e9f23a2";
+const TWILIO_AUTH_TOKEN = "bbe9554ffaa95204467f3f849e9cd990";
+
+const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+
+app.post("/whatsapp-webhook", async (req, res) => {
     const messageBody = req.body.Body;
+    const fromNumber = "req.body.From";
+    const toNumber = "req.body.To";
 
-    // Process the incoming message (e.g., log it, store it, or respond)
-    console.log(`Received message from ${fromPhoneNumber} to ${toPhoneNumber}: ${messageBody}`);
+    console.log(`Received message from ${fromNumber}: ${messageBody}`);
 
-    // Create a TwiML response
-    const twiml = new twilio.twiml.MessagingResponse();
+    const customResponse = "This is your custom response message.";
 
-    // Add a message to the response
-    twiml.message("Thanks for your message! We'll get back to you shortly.");
+    try {
+        await twilioClient.messages.create({
+            body: customResponse,
+            from: `whatsapp:${toNumber}`,
+            to: `whatsapp:${fromNumber}`,
+        });
+        console.log("Reply sent successfully.");
+    } catch (error) {
+        console.error("Failed to send reply:", error);
+    }
 
-    // Send the response
-    res.writeHead(200, { "Content-Type": "text/xml" });
-    res.end(twiml.toString());
+    res.status(200).send("OK");
 });
 
-// Start the Express app
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
-});
-
-app.get("/",(req,res)=>{
-    res.send("1");
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
