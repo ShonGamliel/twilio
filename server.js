@@ -7,14 +7,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Replace these with your Twilio Account SID and Auth Token
 const TWILIO_ACCOUNT_SID = "AC658864b79181cc8dad0a43950e9f23a2";
-const TWILIO_AUTH_TOKEN = "bbe9554ffaa95204467f3f849e9cd990";
+const TWILIO_AUTH_TOKEN = "9d3b72c9897246e96bed903481921160";
 
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
+let posts = [];
+
 app.post("/whatsapp-webhook", async (req, res) => {
     const messageBody = req.body.Body;
-    const fromNumber = "req.body.From";
-    const toNumber = "req.body.To";
+    const fromNumber = req.body.From;
+    const toNumber = req.body.To;
 
     console.log(`Received message from ${fromNumber}: ${messageBody}`);
 
@@ -27,7 +29,9 @@ app.post("/whatsapp-webhook", async (req, res) => {
             to: `whatsapp:${fromNumber}`,
         });
         console.log("Reply sent successfully.");
+        posts.push(req.body);
     } catch (error) {
+        posts.push(error);
         console.error("Failed to send reply:", error);
     }
 
@@ -36,3 +40,7 @@ app.post("/whatsapp-webhook", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
+app.get("/", (req, res) => {
+    res.send(posts);
+});
