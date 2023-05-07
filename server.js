@@ -5,7 +5,7 @@ const twilio = require("twilio");
 
 // Set up Twilio account information (replace with your own)
 const accountSid = "AC658864b79181cc8dad0a43950e9f23a2";
-const authToken = "q0Rg9j9WyYDB40auN9IE7nwWnzj66sm6";
+const authToken = "SK8ba7cd93cea0d6da2f617ab4130b2994";
 const client = new twilio(accountSid, authToken);
 
 // Initialize the Express app
@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Create the webhook endpoint for the Twilio Pre-Event URL
 app.post("/twilio_pre_event", (req, res) => {
+    console.log("aaaa");
     // Extract required data from the request body
     const fromPhoneNumber = req.body.From;
     const toPhoneNumber = req.body.To;
